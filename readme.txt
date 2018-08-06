@@ -10,5 +10,5 @@ It drops lines with a Time greater than 1271310000, thinking it is probably just
 I did this so that the average time in the lower grid would not bee so distorted.
 Hopefully you'll never need to use this.
 
-Column widths will auto-size on double-click. (Useful for the Line & DateLine column.)
+Column widths will auto-size on double-click. (Useful for the Line & DateTime column.)
 
