@@ -35,6 +35,7 @@ namespace MongoLogParse
                     if (line.Contains("CTRL_SHUTDOWN_EVENT"))
                     {
                         //might as well just bail
+                        MessageBox.Show("Warning, this file was not entirly parsed.");
                         break;
                     }
                     if (line.Length > 28)
@@ -104,12 +105,6 @@ namespace MongoLogParse
             });
 
             dataGridView2.DataSource = poorPerformers.OrderByDescending(pp => pp.Avg).OrderByDescending(pp => pp.ColScans).ToList();
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            List<LogEntry> sortedEntries = LogEntries.OrderByDescending(le => le.Time).ToList();
-            dataGridView1.DataSource = sortedEntries;
         }
 
         private void dataGridView2_SelectionChanged(object sender, EventArgs e)
