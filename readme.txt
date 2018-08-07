@@ -7,7 +7,7 @@ The chart is showing the selected row in the lower grid. It is capped at 90 seco
 
 Drop Time Outs only works as the file is being loaded. 
 It drops lines with a Time greater than 1271310000, thinking it is probably just a fail.
-I did this so that the average time in the lower grid would not bee so distorted.
+I did this so that the average time in the lower grid would not be so distorted.
 Hopefully you'll never need to use this.
 
 Column widths will auto-size on double-click. (Useful for the Line & DateTime column.)
