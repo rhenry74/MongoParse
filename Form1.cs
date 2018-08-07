@@ -13,6 +13,8 @@ namespace MongoLogParse
 {
     public partial class Form1 : Form
     {
+        int timeOuts = 0;
+
         public Form1()
         {
             InitializeComponent();
@@ -22,70 +24,72 @@ namespace MongoLogParse
 
         private void button1_Click(object sender, EventArgs e)
         {
-            int timeOuts = 0;
+            
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 this.Text = this.Text + ", " + openFileDialog1.FileName;
 
-                var inStream = openFileDialog1.OpenFile();
-                TextReader reader = new StreamReader(inStream);
-                string line = reader.ReadLine();
-                while (line != null)
+                using (var inStream = openFileDialog1.OpenFile())
                 {
-                    if (line.Contains("CTRL_SHUTDOWN_EVENT"))
+                    TextReader reader = new StreamReader(inStream);
+                    string line = reader.ReadLine();
+                    while (line != null)
                     {
-                        //might as well just bail
-                        MessageBox.Show("Warning, this file was not entirly parsed.");
-                        break;
-                    }
-                    if (line.Length > 28)
-                    {
-                        int dtEnd = line.IndexOf(' ');
-                        string dt = line.Substring(0, dtEnd);
-                        if (dt.Length == 28)
+                        if (line.Contains("CTRL_SHUTDOWN_EVENT"))
                         {
-                            int conEnd = line.IndexOf(' ', dtEnd + 1);
-                            string con = line.Substring(dtEnd + 1, conEnd - dtEnd - 1);
-                            int commamdEnd = line.IndexOf(' ', conEnd + 1);
-                            string command = line.Substring(conEnd + 1, commamdEnd - conEnd - 1);
-                            if (command == "query" || command == "command")
+                            //might as well just bail
+                            MessageBox.Show("Warning, this file was not entirly parsed.");
+                            break;
+                        }
+                        if (line.Length > 28)
+                        {
+                            int dtEnd = line.IndexOf(' ');
+                            string dt = line.Substring(0, dtEnd);
+                            if (dt.Length == 28)
                             {
-                                int dbEnd = line.IndexOf('.', commamdEnd + 1);
-                                string db = line.Substring(commamdEnd + 1, dbEnd - commamdEnd - 1);
-                                int collectionEnd = line.IndexOf(' ', dbEnd + 1);
-                                string collection = line.Substring(dbEnd + 1, collectionEnd - dbEnd - 1);
-
-                                int timeStart = line.LastIndexOf(' ');
-                                string time = line.Substring(timeStart + 1, line.Length - timeStart - 3);
-
-                                LogEntry logEntry = new LogEntry()
+                                int conEnd = line.IndexOf(' ', dtEnd + 1);
+                                string con = line.Substring(dtEnd + 1, conEnd - dtEnd - 1);
+                                int commamdEnd = line.IndexOf(' ', conEnd + 1);
+                                string command = line.Substring(conEnd + 1, commamdEnd - conEnd - 1);
+                                if (command == "query" || command == "command")
                                 {
-                                    DateTime = DateTime.Parse(dt),
-                                    Connection = con,
-                                    Command = command,
-                                    Database = db,
-                                    Collection = collection,
-                                    Time = int.Parse(time),
-                                    CollScan = line.Contains("COLLSCAN"),
-                                    Line = line
-                                };
+                                    int dbEnd = line.IndexOf('.', commamdEnd + 1);
+                                    string db = line.Substring(commamdEnd + 1, dbEnd - commamdEnd - 1);
+                                    int collectionEnd = line.IndexOf(' ', dbEnd + 1);
+                                    string collection = line.Substring(dbEnd + 1, collectionEnd - dbEnd - 1);
 
-                                if (logEntry.Time < 1271310000)
-                                {
-                                    LogEntries.Add(logEntry);                                    
-                                }
-                                else
-                                {
-                                    timeOuts++;
-                                    if (!cbDropTimeOuts.Checked)
+                                    int timeStart = line.LastIndexOf(' ');
+                                    string time = line.Substring(timeStart + 1, line.Length - timeStart - 3);
+
+                                    LogEntry logEntry = new LogEntry()
+                                    {
+                                        DateTime = DateTime.Parse(dt),
+                                        Connection = con,
+                                        Command = command,
+                                        Database = db,
+                                        Collection = collection,
+                                        Time = int.Parse(time),
+                                        CollScan = line.Contains("COLLSCAN"),
+                                        Line = line
+                                    };
+
+                                    if (logEntry.Time < 1271310000)
                                     {
                                         LogEntries.Add(logEntry);
-                                    }                                    
+                                    }
+                                    else
+                                    {
+                                        timeOuts++;
+                                        if (!cbDropTimeOuts.Checked)
+                                        {
+                                            LogEntries.Add(logEntry);
+                                        }
+                                    }
                                 }
                             }
                         }
+                        line = reader.ReadLine();
                     }
-                    line = reader.ReadLine();                    
                 }
             }
 
