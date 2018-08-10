@@ -58,6 +58,13 @@ namespace MongoLogParse
                                     int collectionEnd = line.IndexOf(' ', dbEnd + 1);
                                     string collection = line.Substring(dbEnd + 1, collectionEnd - dbEnd - 1);
 
+                                    if (collection=="$cmd")
+                                    {
+                                        int cmdTypeEnd = line.IndexOf('{', collectionEnd + 10) - 2;
+                                        string cmdType = line.Substring(collectionEnd + 10, cmdTypeEnd - (collectionEnd + 10) + 1);
+                                        collection = collection + ": " + cmdType;
+                                    }
+
                                     int timeStart = line.LastIndexOf(' ');
                                     string time = line.Substring(timeStart + 1, line.Length - timeStart - 3);
 
