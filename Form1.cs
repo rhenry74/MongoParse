@@ -49,12 +49,17 @@ namespace MongoLogParse
                             {
                                 int conEnd = line.IndexOf(' ', dtEnd + 1);
                                 string con = line.Substring(dtEnd + 1, conEnd - dtEnd - 1);
-                                int commamdEnd = line.IndexOf(' ', conEnd + 1);
-                                string command = line.Substring(conEnd + 1, commamdEnd - conEnd - 1);
+                                int commandEnd = line.IndexOf(' ', conEnd + 1);
+                                if (commandEnd == -1)
+                                {
+                                    line = reader.ReadLine();
+                                    continue;
+                                }
+                                string command = line.Substring(conEnd + 1, commandEnd - conEnd - 1);
                                 if (command == "query" || command == "command")
                                 {
-                                    int dbEnd = line.IndexOf('.', commamdEnd + 1);
-                                    string db = line.Substring(commamdEnd + 1, dbEnd - commamdEnd - 1);
+                                    int dbEnd = line.IndexOf('.', commandEnd + 1);
+                                    string db = line.Substring(commandEnd + 1, dbEnd - commandEnd - 1);
                                     int collectionEnd = line.IndexOf(' ', dbEnd + 1);
                                     string collection = line.Substring(dbEnd + 1, collectionEnd - dbEnd - 1);
 
