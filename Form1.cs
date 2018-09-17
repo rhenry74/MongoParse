@@ -31,76 +31,13 @@ namespace MongoLogParse
 
                 using (var inStream = openFileDialog1.OpenFile())
                 {
-                    TextReader reader = new StreamReader(inStream);
-                    string line = reader.ReadLine();
-                    while (line != null)
+                    if(v2Radio.Checked)
                     {
-                        if (line.Contains("CTRL_SHUTDOWN_EVENT"))
-                        {
-                            //might as well just bail
-                            MessageBox.Show("Warning, this file was not entirly parsed.");
-                            break;
-                        }
-                        if (line.Length > 28)
-                        {
-                            int dtEnd = line.IndexOf(' ');
-                            string dt = line.Substring(0, dtEnd);
-                            if (dt.Length == 28)
-                            {
-                                int conEnd = line.IndexOf(' ', dtEnd + 1);
-                                string con = line.Substring(dtEnd + 1, conEnd - dtEnd - 1);
-                                int commandEnd = line.IndexOf(' ', conEnd + 1);
-                                if (commandEnd == -1)
-                                {
-                                    line = reader.ReadLine();
-                                    continue;
-                                }
-                                string command = line.Substring(conEnd + 1, commandEnd - conEnd - 1);
-                                if (command == "query" || command == "command")
-                                {
-                                    int dbEnd = line.IndexOf('.', commandEnd + 1);
-                                    string db = line.Substring(commandEnd + 1, dbEnd - commandEnd - 1);
-                                    int collectionEnd = line.IndexOf(' ', dbEnd + 1);
-                                    string collection = line.Substring(dbEnd + 1, collectionEnd - dbEnd - 1);
-
-                                    if (collection=="$cmd")
-                                    {
-                                        int cmdTypeEnd = line.IndexOf('{', collectionEnd + 10) - 2;
-                                        string cmdType = line.Substring(collectionEnd + 10, cmdTypeEnd - (collectionEnd + 10) + 1);
-                                        collection = collection + ": " + cmdType;
-                                    }
-
-                                    int timeStart = line.LastIndexOf(' ');
-                                    string time = line.Substring(timeStart + 1, line.Length - timeStart - 3);
-
-                                    LogEntry logEntry = new LogEntry()
-                                    {
-                                        DateTime = DateTime.Parse(dt),
-                                        Connection = con,
-                                        Command = command,
-                                        Database = db,
-                                        Collection = collection,
-                                        Time = int.Parse(time),
-                                        CollScan = line.Contains("COLLSCAN"),
-                                        Line = line
-                                    };
-
-                                    if (logEntry.Time < 1271310000)
-                                    {
-                                        LogEntries.Add(logEntry);
-                                    }
-                                    else
-                                    {
-                                        timeOuts++;
-                                        if (!cbDropTimeOuts.Checked)
-                                        {
-                                            LogEntries.Add(logEntry);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        line = reader.ReadLine();
+                        V2Parse(inStream);
+                    }
+                    if (v3Radio.Checked)
+                    {
+                        V3Parse(inStream);
                     }
                 }
             }
@@ -122,6 +59,172 @@ namespace MongoLogParse
 
             dataGridView2.DataSource = poorPerformers.OrderByDescending(pp => pp.Avg).OrderByDescending(pp => pp.ColScans).ToList();
         }
+
+        private void V2Parse(Stream inStream)
+        {
+            TextReader reader = new StreamReader(inStream);
+            string line = reader.ReadLine();
+            while (line != null)
+            {
+                if (line.Contains("CTRL_SHUTDOWN_EVENT"))
+                {
+                    //might as well just bail
+                    MessageBox.Show("Warning, this file was not entirly parsed.");
+                    break;
+                }
+                if (line.Length > 28)
+                {
+                    int dtEnd = line.IndexOf(' ');
+                    string dt = line.Substring(0, dtEnd);
+                    if (dt.Length == 28)
+                    {
+                        int conEnd = line.IndexOf(' ', dtEnd + 1);
+                        string con = line.Substring(dtEnd + 1, conEnd - dtEnd - 1);
+                        int commandEnd = line.IndexOf(' ', conEnd + 1);
+                        if (commandEnd == -1)
+                        {
+                            line = reader.ReadLine();
+                            continue;
+                        }
+                        string command = line.Substring(conEnd + 1, commandEnd - conEnd - 1);
+                        if (command == "query" || command == "command")
+                        {
+                            int dbEnd = line.IndexOf('.', commandEnd + 1);
+                            string db = line.Substring(commandEnd + 1, dbEnd - commandEnd - 1);
+                            int collectionEnd = line.IndexOf(' ', dbEnd + 1);
+                            string collection = line.Substring(dbEnd + 1, collectionEnd - dbEnd - 1);
+
+                            if (collection == "$cmd")
+                            {
+                                int cmdTypeEnd = line.IndexOf('{', collectionEnd + 10) - 2;
+                                string cmdType = line.Substring(collectionEnd + 10, cmdTypeEnd - (collectionEnd + 10) + 1);
+                                collection = collection + ": " + cmdType;
+                            }
+
+                            int timeStart = line.LastIndexOf(' ');
+                            string time = line.Substring(timeStart + 1, line.Length - timeStart - 3);
+
+                            LogEntry logEntry = new LogEntry()
+                            {
+                                DateTime = DateTime.Parse(dt),
+                                Connection = con,
+                                Command = command,
+                                Database = db,
+                                Collection = collection,
+                                Time = int.Parse(time),
+                                CollScan = line.Contains("COLLSCAN"),
+                                Line = line
+                            };
+
+                            if (logEntry.Time < 1271310000)
+                            {
+                                LogEntries.Add(logEntry);
+                            }
+                            else
+                            {
+                                timeOuts++;
+                                if (!cbDropTimeOuts.Checked)
+                                {
+                                    LogEntries.Add(logEntry);
+                                }
+                            }
+                        }
+                    }
+                }
+                line = reader.ReadLine();
+            }
+        }
+
+        private void V3Parse(Stream inStream)
+        {
+            TextReader reader = new StreamReader(inStream);
+            string line = reader.ReadLine();
+            while (line != null)
+            {
+                if (line.Contains("CTRL_SHUTDOWN_EVENT"))
+                {
+                    //might as well just bail
+                    MessageBox.Show("Warning, this file was not entirly parsed.");
+                    break;
+                }
+                if (line.Length > 28)
+                {
+                    int dtEnd = line.IndexOf(' ');
+                    string dt = line.Substring(0, dtEnd);
+                    if (dt.Length == 28)
+                    {
+                        int conEnd = line.IndexOf(' ', dtEnd + 12);
+                        string con = line.Substring(dtEnd + 12, conEnd - (dtEnd + 11));
+                        int commandEnd = line.IndexOf(' ', conEnd + 1);
+                        if (commandEnd == -1)
+                        {
+                            line = reader.ReadLine();
+                            continue;
+                        }
+                        string command = line.Substring(conEnd + 1, commandEnd - conEnd - 1);
+                        if (command == "query" || command == "command")
+                        {
+                            bool isQuery = command == "query";
+
+                            int dbEnd = line.IndexOf('.', commandEnd + 1);
+                            if (dbEnd == -1)
+                            {
+                                line = reader.ReadLine();
+                                continue;
+                            }
+                            string db = line.Substring(commandEnd + 1, dbEnd - commandEnd - 1);
+                            int collectionEnd = line.IndexOf(' ', dbEnd + 1);
+                            string collection = line.Substring(dbEnd + 1, collectionEnd - dbEnd - 1);
+
+                            if (!isQuery)
+                            {
+                                int commandStart = line.IndexOf("command:", collectionEnd);
+                                commandEnd = line.IndexOf(" ", commandStart + 9);
+                                command = line.Substring(commandStart + 9, commandEnd - (commandStart + 9));
+                                collection = collection + ": " + command;
+                            }
+
+                            //if (collection == "$cmd")
+                            //{
+                            //    int cmdTypeEnd = line.IndexOf('{', collectionEnd + 10) - 2;
+                            //    string cmdType = line.Substring(collectionEnd + 10, cmdTypeEnd - (collectionEnd + 10) + 1);
+                            //    collection = collection + ": " + cmdType;
+                            //}
+
+                            int timeStart = line.LastIndexOf(' ');
+                            string time = line.Substring(timeStart + 1, line.Length - timeStart - 3);
+
+                            LogEntry logEntry = new LogEntry()
+                            {
+                                DateTime = DateTime.Parse(dt),
+                                Connection = con,
+                                Command = command,
+                                Database = db,
+                                Collection = collection,
+                                Time = int.Parse(time),
+                                CollScan = line.Contains("COLLSCAN"),
+                                Line = line
+                            };
+
+                            if (logEntry.Time < 1271310000)
+                            {
+                                LogEntries.Add(logEntry);
+                            }
+                            else
+                            {
+                                timeOuts++;
+                                if (!cbDropTimeOuts.Checked)
+                                {
+                                    LogEntries.Add(logEntry);
+                                }
+                            }
+                        }
+                    }
+                }
+                line = reader.ReadLine();
+            }
+        }
+
 
         private void dataGridView2_SelectionChanged(object sender, EventArgs e)
         {

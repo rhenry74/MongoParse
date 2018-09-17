@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.button1 = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
@@ -43,9 +43,13 @@
             this.cbDropTimeOuts = new System.Windows.Forms.CheckBox();
             this.tbTimeOuts = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.v2Radio = new System.Windows.Forms.RadioButton();
+            this.v3Radio = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // button1
@@ -100,19 +104,19 @@
             // 
             this.chart1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            chartArea1.CursorX.IsUserSelectionEnabled = true;
-            chartArea1.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea1);
+            chartArea2.CursorX.IsUserSelectionEnabled = true;
+            chartArea2.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea2);
             this.chart1.Location = new System.Drawing.Point(694, 311);
             this.chart1.Name = "chart1";
             this.chart1.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.EarthTones;
-            series1.ChartArea = "ChartArea1";
-            series1.LabelToolTip = "#VALX";
-            series1.Name = "Series1";
-            series1.XValueMember = "DateTime";
-            series1.YValueMembers = "Time";
-            series1.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Int32;
-            this.chart1.Series.Add(series1);
+            series2.ChartArea = "ChartArea1";
+            series2.LabelToolTip = "#VALX";
+            series2.Name = "Series1";
+            series2.XValueMember = "DateTime";
+            series2.YValueMembers = "Time";
+            series2.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Int32;
+            this.chart1.Series.Add(series2);
             this.chart1.Size = new System.Drawing.Size(414, 236);
             this.chart1.TabIndex = 5;
             this.chart1.Text = "chart1";
@@ -183,6 +187,39 @@
             this.label4.TabIndex = 11;
             this.label4.Text = "Time Outs:";
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.v3Radio);
+            this.groupBox1.Controls.Add(this.v2Radio);
+            this.groupBox1.Location = new System.Drawing.Point(694, -8);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(354, 48);
+            this.groupBox1.TabIndex = 13;
+            this.groupBox1.TabStop = false;
+            // 
+            // v2Radio
+            // 
+            this.v2Radio.AutoSize = true;
+            this.v2Radio.Checked = true;
+            this.v2Radio.Location = new System.Drawing.Point(11, 16);
+            this.v2Radio.Name = "v2Radio";
+            this.v2Radio.Size = new System.Drawing.Size(38, 17);
+            this.v2Radio.TabIndex = 0;
+            this.v2Radio.TabStop = true;
+            this.v2Radio.Text = "V2";
+            this.v2Radio.UseVisualStyleBackColor = true;
+            // 
+            // v3Radio
+            // 
+            this.v3Radio.AutoSize = true;
+            this.v3Radio.Location = new System.Drawing.Point(77, 16);
+            this.v3Radio.Name = "v3Radio";
+            this.v3Radio.Size = new System.Drawing.Size(38, 17);
+            this.v3Radio.TabIndex = 1;
+            this.v3Radio.TabStop = true;
+            this.v3Radio.Text = "V3";
+            this.v3Radio.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -200,11 +237,14 @@
             this.Controls.Add(this.dataGridView2);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.button1);
+            this.Controls.Add(this.groupBox1);
             this.Name = "Form1";
             this.Text = "Mongo Parse";
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -225,6 +265,9 @@
         private System.Windows.Forms.CheckBox cbDropTimeOuts;
         private System.Windows.Forms.TextBox tbTimeOuts;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.RadioButton v3Radio;
+        private System.Windows.Forms.RadioButton v2Radio;
     }
 }
 
