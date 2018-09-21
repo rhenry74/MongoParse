@@ -21,6 +21,7 @@ namespace MongoLogParse
         }
 
         private List<LogEntry> LogEntries = new List<LogEntry>();
+        private List<LogEntry> TrashEntries = new List<LogEntry>();
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -66,6 +67,9 @@ namespace MongoLogParse
             string line = reader.ReadLine();
             while (line != null)
             {
+                LogEntry logEntry = new LogEntry();
+                logEntry.Line = line;
+
                 if (line.Contains("CTRL_SHUTDOWN_EVENT"))
                 {
                     //might as well just bail
@@ -78,19 +82,25 @@ namespace MongoLogParse
                     string dt = line.Substring(0, dtEnd);
                     if (dt.Length == 28)
                     {
+                        logEntry.DateTime = DateTime.Parse(dt);
                         int conEnd = line.IndexOf(' ', dtEnd + 1);
                         string con = line.Substring(dtEnd + 1, conEnd - dtEnd - 1);
+                        logEntry.Connection = con;
                         int commandEnd = line.IndexOf(' ', conEnd + 1);
                         if (commandEnd == -1)
                         {
+                            TrashEntries.Add(logEntry);
                             line = reader.ReadLine();
                             continue;
                         }
                         string command = line.Substring(conEnd + 1, commandEnd - conEnd - 1);
-                        if (command == "query" || command == "command")
+                        logEntry.Command = command;
+
+                        if (command == "query" || command == "command" || command == "insert")
                         {
                             int dbEnd = line.IndexOf('.', commandEnd + 1);
                             string db = line.Substring(commandEnd + 1, dbEnd - commandEnd - 1);
+                            logEntry.Database = db;
                             int collectionEnd = line.IndexOf(' ', dbEnd + 1);
                             string collection = line.Substring(dbEnd + 1, collectionEnd - dbEnd - 1);
 
@@ -100,22 +110,32 @@ namespace MongoLogParse
                                 string cmdType = line.Substring(collectionEnd + 10, cmdTypeEnd - (collectionEnd + 10) + 1);
                                 collection = collection + ": " + cmdType;
                             }
+                            logEntry.Collection = collection;
 
-                            int timeStart = line.LastIndexOf(' ');
-                            string time = line.Substring(timeStart + 1, line.Length - timeStart - 3);
-
-                            LogEntry logEntry = new LogEntry()
+                            //it gets scary from here to end crazy times
+                            int timeInt = 0;
+                            ReTryIt:
+                            try
                             {
-                                DateTime = DateTime.Parse(dt),
-                                Connection = con,
-                                Command = command,
-                                Database = db,
-                                Collection = collection,
-                                Time = int.Parse(time),
-                                CollScan = line.Contains("COLLSCAN"),
-                                Line = line
-                            };
+                                int timeStart = line.LastIndexOf(' ');
+                                string time = line.Substring(timeStart + 1, line.Length - timeStart - 3);
+                                timeInt=int.Parse(time);
+                            }
+                            catch
+                            {
+                                line = line + reader.ReadLine();
+                                while (line.Substring(line.Length - 2, 2) != "ms")
+                                {
+                                    line = line + reader.ReadLine();
+                                }
+                                logEntry.Line = line;
+                                goto ReTryIt;
+                            }
+                            logEntry.Time = timeInt;
+                            //end crazy times
 
+                            logEntry.CollScan = line.Contains("COLLSCAN");                       
+                            
                             if (logEntry.Time < 1271310000)
                             {
                                 LogEntries.Add(logEntry);
@@ -129,8 +149,14 @@ namespace MongoLogParse
                                 }
                             }
                         }
+                        else
+                            TrashEntries.Add(logEntry);
                     }
+                    else
+                        TrashEntries.Add(logEntry);
                 }
+                else
+                    TrashEntries.Add(logEntry);
                 line = reader.ReadLine();
             }
         }
@@ -316,6 +342,30 @@ namespace MongoLogParse
             }
         }
 
-       
+        private void btFilter_Click(object sender, EventArgs e)
+        {
+            List<LogEntry> inGrid = (List<LogEntry>)dataGridView1.DataSource;
+            List<LogEntry> filteredEntries = inGrid.Where(le => le.Line.Contains(tbFilter.Text)).
+                        OrderBy(le => le.DateTime).ToList();
+            dataGridView1.DataSource = filteredEntries;
+        }
+
+        private void btClearFilter_Click(object sender, EventArgs e)
+        {
+            dataGridView1.DataSource = LogEntries;
+        }
+
+        private void checkBox2_Click(object sender, EventArgs e)
+        {
+            if (checkBox2.Checked)
+            {
+                dataGridView1.DataSource = TrashEntries;
+            }
+            else
+            {
+                dataGridView1.DataSource = LogEntries;
+
+            }
+        }
     }
 }
