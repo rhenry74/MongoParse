@@ -15,6 +15,7 @@ Column widths will auto-size on double-click. (Useful for the Line & DateTime co
 Search will filter down lines based on entry, on 'Go' and restore all lines on 'No'.
 
 Show trash will merge in lines that are excluded because they are not 'performance' related.
+Select a row and it will be at the top of the list after Show Trash is complete.
 
 Filter List to Collection will filter the list to the collection selected in the bottom grid.
 
