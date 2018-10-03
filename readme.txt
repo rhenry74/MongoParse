@@ -12,3 +12,14 @@ Hopefully you'll never need to use this.
 
 Column widths will auto-size on double-click. (Useful for the Line & DateTime column.)
 
+Search will filter down lines based on entry, on 'Go' and restore all lines on 'No'.
+
+Show trash will merge in lines that are excluded because they are not 'performance' related.
+
+Filter List to Collection will filter the list to the collection selected in the bottom grid.
+
+V2 / V3 selects a different parser, roughly related to the Mongo sevr version. The V2 parser is more vetted. Show Trash will not work with a V3 log file.
+
+Warning: You can easily get the check boxes in a state that does not match the data in the list by mixing operations.
+
+
