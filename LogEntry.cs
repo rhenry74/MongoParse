@@ -16,6 +16,6 @@ namespace MongoLogParse
         public bool CollScan { get; internal set; }
         public int Time { get;  set; }
         public string Line { get; internal set; }
-        
+        public long LineNumber;
     }
 }

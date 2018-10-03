@@ -65,10 +65,12 @@ namespace MongoLogParse
         {
             TextReader reader = new StreamReader(inStream);
             string line = reader.ReadLine();
+            long lineNumber = 1;
             while (line != null)
             {
                 LogEntry logEntry = new LogEntry();
                 logEntry.Line = line;
+                logEntry.LineNumber = lineNumber;
 
                 if (line.Contains("CTRL_SHUTDOWN_EVENT"))
                 {
@@ -91,6 +93,7 @@ namespace MongoLogParse
                         {
                             TrashEntries.Add(logEntry);
                             line = reader.ReadLine();
+                            lineNumber++;
                             continue;
                         }
                         string command = line.Substring(conEnd + 1, commandEnd - conEnd - 1);
@@ -124,9 +127,11 @@ namespace MongoLogParse
                             catch
                             {
                                 line = line + reader.ReadLine();
+                                lineNumber++;
                                 while (line.Substring(line.Length - 2, 2) != "ms")
                                 {
                                     line = line + reader.ReadLine();
+                                    lineNumber++;
                                 }
                                 logEntry.Line = line;
                                 goto ReTryIt;
@@ -158,6 +163,7 @@ namespace MongoLogParse
                 else
                     TrashEntries.Add(logEntry);
                 line = reader.ReadLine();
+                lineNumber++;
             }
         }
 
@@ -165,6 +171,7 @@ namespace MongoLogParse
         {
             TextReader reader = new StreamReader(inStream);
             string line = reader.ReadLine();
+            
             while (line != null)
             {
                 if (line.Contains("CTRL_SHUTDOWN_EVENT"))
@@ -359,7 +366,25 @@ namespace MongoLogParse
         {
             if (checkBox2.Checked)
             {
-                dataGridView1.DataSource = TrashEntries;
+                //merge trash and log sorted on date
+                var merger = LogEntries.ToList();
+                merger.AddRange(TrashEntries);
+                merger = merger.OrderBy(entry => entry.LineNumber).ToList();
+
+                //save the location of the selected row
+                string selectedLine=null;
+                if (dataGridView1.SelectedRows.Count == 1)
+                {
+                    var selectedRow = dataGridView1.SelectedRows[0].Index;
+                    selectedLine = ((List<LogEntry>)dataGridView1.DataSource)[selectedRow].Line;
+                }
+                dataGridView1.DataSource = merger;
+                //scroll to the selected row
+                if (selectedLine != null)
+                {
+                    var indexInMerger = merger.IndexOf(merger.Find(entry => entry.Line == selectedLine));
+                    dataGridView1.FirstDisplayedScrollingRowIndex = indexInMerger;
+                }
             }
             else
             {
@@ -367,5 +392,7 @@ namespace MongoLogParse
 
             }
         }
+
+        
     }
 }
